@@ -14,7 +14,6 @@ Readonly::Scalar our $VERSION => do { my ($r) = q$LastChangedRevision: 5210 $ =~
 
 with Storage('format' => 'JSON', 'io' => 'File');
 
-
 =head1 NAME
 
 MooseX::AttributeCloner
@@ -101,6 +100,8 @@ __END__
 =item English -no_match_vars
 
 =item Readonly
+
+=item MooseX::Storage
 
 =back
 
