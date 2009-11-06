@@ -10,6 +10,13 @@ use English qw{-no_match_vars};
 
 with qw{MooseX::AttributeCloner};
 
+has q{attr1} => (isa => q{Str}, is => q{ro});
+has q{attr2} => (isa => q{Str}, is => q{ro});
+has q{attr3} => (isa => q{Str}, is => q{ro});
+has q{attr4} => (isa => q{Str}, is => q{ro});
+has q{attr5} => (isa => q{Str}, is => q{ro});
+has q{attr6} => (isa => q{Str}, is => q{ro});
+has q{attr7} => (isa => q{Str}, is => q{ro});
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

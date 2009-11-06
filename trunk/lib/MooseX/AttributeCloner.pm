@@ -7,7 +7,13 @@ use Moose::Role;
 use Carp;
 use English qw{-no_match_vars};
 use Readonly;
+
+use MooseX::Storage;
+
 Readonly::Scalar our $VERSION => do { my ($r) = q$LastChangedRevision: 5210 $ =~ /(\d+)/mxs; $r; };
+
+with Storage('format' => 'JSON', 'io' => 'File');
+
 
 =head1 NAME
 
@@ -67,8 +73,13 @@ sub new_with_cloned_attributes {
   } or do {
     croak $EVAL_ERROR;
   };
-  
-  my $class_object = $package->new($arg_refs);
+
+  my $attributes = $self->pack();
+  delete $attributes->{q{__CLASS__}};
+  foreach my $key (keys %{$arg_refs}) {
+    $attributes->{$key} = $arg_refs->{$key};
+  }
+  my $class_object = $package->new($attributes);
   return $class_object;
 }
 
