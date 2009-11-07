@@ -76,6 +76,40 @@ sub new_with_cloned_attributes {
   return $package->new($arg_refs);
 }
 
+=head2 attributes_as_json - returns all the built attributes that are not objects as a JSON string
+
+  my $sAttributesAsJSON = $class->attributes_as_json();
+
+=head2 attributes_as_escaped_json - as attributes_as_json, except it is an escaped JSON string, so that this could be used
+on a command line
+
+  my $sAttributesAsEscapedJSON = $class->attributes_as_escaped_json();
+
+This uses JSON to generate the string, removing any objects before stringifying, and then parses it through a regex to generate a string with escaped characters
+Note, because objects are removed, arrays will remain the correct length, but have null in them
+=cut
+
+sub attributes_as_escaped_json {
+  my ($self) = @_;
+  my $json = $self->attributes_as_json();
+  $json =~ s{([^A-Za-z0-9_-])}{\\$1}gmxs;
+  return $json;
+}
+
+sub attributes_as_json {
+  my ($self) = @_;
+
+  my $attributes = $self->_hash_of_attribute_values();
+  # remove any objects from the hash
+  $self->_traverse_hash($attributes);
+  my $json = to_json($attributes);
+  return $json;
+}
+
+###############
+# private methods
+
+
 # a hash_ref of attribute values from $self, where built
 # either acts on a provided hash_ref, or will return a new one
 sub _hash_of_attribute_values {
@@ -100,35 +134,6 @@ sub _hash_of_attribute_values {
   }
 
   return $arg_refs;
-}
-
-=head2 attributes_as_json - returns all the built attributes that are not objects as a JSON string
-
-  my $sAttributesAsJSON = $class->attributes_as_json();
-=head2 attributes_as_escaped_json - as attributes_as_json, except it is an escaped JSON string, so that this could be used
-on a command line
-
-  my $sAttributesAsEscapedJSON = $class->attributes_as_escaped_json();
-
-This uses JSON to generate the string, removing any objects before stringifying, and then parses it through a regex to generate a string with escaped characters
-Note, because objects are removed, arrays will remain the correct length, but have null in them
-=cut
-
-sub attributes_as_escaped_json {
-  my ($self) = @_;
-  my $json = $self->attributes_as_json();
-  $json =~ s{}{}gxms;
-  return $json;
-}
-
-sub attributes_as_json {
-  my ($self) = @_;
-
-  my $attributes = $self->_hash_of_attribute_values();
-  # remove any objects from the hash
-  $self->_traverse_hash($attributes);
-  my $json = to_json($attributes);
-  return $json;
 }
 
 # remove any objects from a hash

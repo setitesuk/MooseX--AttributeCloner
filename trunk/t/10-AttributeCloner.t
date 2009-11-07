@@ -64,5 +64,7 @@ BEGIN {
 
   is_deeply(from_json($ref_test->attributes_as_json()), $json_test_hash, q{json string is ok});
 
+  my $escaped_json_string = q(\{\"hash_attr\"\:\{\"key2\"\:\"val2\"\,\"key1\"\:\"val1\"\}\,\"attr2\"\:\"0\"\,\"attr1\"\:\"test1\"\,\"array_attr\"\:\[1\,2\,3\,\{\"key2\"\:\"val2\"\,\"key1\"\:\"val1\"\}\,null\]\});
+  is($ref_test->attributes_as_escaped_json(), $escaped_json_string, q{escaped json string ok});
 }
 1;
