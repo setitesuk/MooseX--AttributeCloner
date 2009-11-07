@@ -4,15 +4,16 @@
 
 package MooseX::AttributeCloner;
 use Moose::Role;
-use Carp;
+use Carp qw{carp cluck croak confess};
 use English qw{-no_match_vars};
 use Readonly;
 
 use MooseX::Storage;
+use JSON;
 
 Readonly::Scalar our $VERSION => do { my ($r) = q$LastChangedRevision: 5210 $ =~ /(\d+)/mxs; $r; };
 
-with Storage('format' => 'JSON', 'io' => 'File');
+with Storage('format' => 'JSON', 'io' => 'File', traits => [qw{OnlyWhenBuilt}]);
 
 =head1 NAME
 
@@ -59,7 +60,6 @@ plus anything in the $arg_refs hash.
 
 sub new_with_cloned_attributes {
   my ($self, $package, $arg_refs) = @_;
-
   $arg_refs ||= {};
 
   eval {
@@ -70,16 +70,111 @@ sub new_with_cloned_attributes {
     }
     require $package_file_name;
   } or do {
-    croak $EVAL_ERROR;
+    confess $EVAL_ERROR;
   };
+  $self->_hash_of_attribute_values($arg_refs);
+  return $package->new($arg_refs);
+}
 
-  my $attributes = $self->pack();
-  delete $attributes->{q{__CLASS__}};
-  foreach my $key (keys %{$arg_refs}) {
-    $attributes->{$key} = $arg_refs->{$key};
+# a hash_ref of attribute values from $self, where built
+# either acts on a provided hash_ref, or will return a new one
+sub _hash_of_attribute_values {
+  my ($self, $arg_refs) = @_;
+  $arg_refs ||= {};
+
+  my @attributes = $self->meta->get_all_attributes();
+  foreach my $attr (@attributes) {
+    my $reader   = $attr->{reader};
+    my $init_arg = $attr->{init_arg};
+
+    # if lazy_build, then will only propagate data if it is built, saving any expensive build routines
+    # obviously, this has the effect that you may need to do it twice, or force a build before the cloning of data
+    if ($attr->{predicate}) {
+      my $pred = $attr->{predicate};
+      next if !$self->$pred();
+    }
+
+    if (!exists$arg_refs->{$init_arg} && defined $self->$reader()) {
+      $arg_refs->{$init_arg} = $self->$reader();
+    }
   }
-  my $class_object = $package->new($attributes);
-  return $class_object;
+
+  return $arg_refs;
+}
+
+=head2 attributes_as_json - returns all the built attributes that are not objects as a JSON string
+
+  my $sAttributesAsJSON = $class->attributes_as_json();
+=head2 attributes_as_escaped_json - as attributes_as_json, except it is an escaped JSON string, so that this could be used
+on a command line
+
+  my $sAttributesAsEscapedJSON = $class->attributes_as_escaped_json();
+
+This uses JSON to generate the string, removing any objects before stringifying, and then parses it through a regex to generate a string with escaped characters
+Note, because objects are removed, arrays will remain the correct length, but have null in them
+=cut
+
+sub attributes_as_escaped_json {
+  my ($self) = @_;
+  my $json = $self->attributes_as_json();
+  $json =~ s{}{}gxms;
+  return $json;
+}
+
+sub attributes_as_json {
+  my ($self) = @_;
+
+  my $attributes = $self->_hash_of_attribute_values();
+  # remove any objects from the hash
+  $self->_traverse_hash($attributes);
+  my $json = to_json($attributes);
+  return $json;
+}
+
+# remove any objects from a hash
+sub _traverse_hash {
+  my ($self, $hash) = @_;
+  my @keys_to_delete;
+  foreach my $key (keys %{$hash}) {
+    next if (!ref $hash->{$key});
+    if (ref$hash->{$key} eq q{HASH}) {
+      $self->_traverse_hash($hash->{$key});
+      next;
+    }
+    if (ref$hash->{$key} eq q{ARRAY}) {
+      $hash->{$key} = $self->_traverse_array($hash->{$key});
+      next;
+    }
+    push @keys_to_delete, $key;
+  }
+  foreach my $key (@keys_to_delete) {
+    delete $hash->{$key};
+  }
+  return $hash;
+}
+
+# remove any objects from an array
+sub _traverse_array {
+  my ($self, $array) = @_;
+  my @wanted_items;
+  foreach my $item (@{$array}) {
+    if (!ref $item) {
+      push @wanted_items, $item;
+      next;
+    }
+    if (ref$item eq q{HASH}) {
+      $self->_traverse_hash($item);
+      push @wanted_items, $item;
+      next;
+    }
+    if (ref$item eq q{ARRAY}) {
+      $item = $self->_traverse_array($item);
+      push @wanted_items, $item;
+      next;
+    }
+    push @wanted_items, undef;
+  }
+  return \@wanted_items;
 }
 
 1;
