@@ -8,12 +8,9 @@ use Carp qw{carp cluck croak confess};
 use English qw{-no_match_vars};
 use Readonly;
 
-use MooseX::Storage;
 use JSON;
 
 Readonly::Scalar our $VERSION => do { my ($r) = q$LastChangedRevision: 5210 $ =~ /(\d+)/mxs; $r; };
-
-with Storage('format' => 'JSON', 'io' => 'File', traits => [qw{OnlyWhenBuilt}]);
 
 =head1 NAME
 
