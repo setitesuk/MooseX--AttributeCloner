@@ -1,6 +1,7 @@
 Build.PL
 Changes
 MANIFEST
+MooseX-AttributeCloner-0.1.tar.gz
 README
 lib/MooseX/AttributeCloner.pm
 t/00-critic.t
