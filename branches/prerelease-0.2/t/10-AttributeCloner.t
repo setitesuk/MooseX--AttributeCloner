@@ -56,8 +56,13 @@ BEGIN {
   is($cloned_ref_test->object_attr(), $object_to_clone, q{object_attr is correct});
   is($cloned_ref_test->hash_attr(), $hash_ref, q{hash_attr is correct});
   is($cloned_ref_test->array_attr(), $array_ref, q{array_ref is correct});
+  my $hash_key_object = $cloned_ref_test->hash_attr()->{key_obj};
   is($cloned_ref_test->hash_attr()->{key_obj}, $cloned_object, q{hash maintained});
+  isa_ok($hash_key_object, q{TestNewAttributeCloner}, q{$cloned_ref_test->hash_attr()->{key_obj}});
+  ok(ref$hash_key_object, q{$cloned_ref_test->hash_attr() is a ref});
   is($cloned_ref_test->array_attr()->[3],$hash_ref, q{array maintained});
+
+  
 
   my $json_string = q[{"hash_attr":{"key2":"val2","key1":"val1"},"attr2":"0","attr1":"test1","array_attr":[1,2,3,{"key2":"val2","key1":"val1"},null]}];
   my $json_test_hash = from_json($json_string);

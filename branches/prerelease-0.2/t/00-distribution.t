@@ -10,7 +10,6 @@ use strict;
 use warnings;
 use Test::More;
 use English qw(-no_match_vars);
-use SangerPaths qw(core tracking badger ensembl);
 
 our $VERSION = do { my @r = (q$LastChangedRevision: 5780 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 

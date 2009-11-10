@@ -119,18 +119,21 @@ sub _hash_of_attribute_values {
 
   my @attributes = $self->meta->get_all_attributes();
   foreach my $attr (@attributes) {
-    my $reader   = $attr->{reader};
-    my $init_arg = $attr->{init_arg};
+    my $reader   = $attr->reader();
+    my $init_arg = $attr->init_arg();
 
     next if (!$reader); # if there is no reader method, then we can't read the attribute value, so skip
+    next if ($reader =~ /\A_/xms);
 
-    # if lazy_build, then will only propagate data if it is built, saving any expensive build routines
+    # if lazy_build, then will only propagate data if it is built, saving any expensive build routines.
     # obviously, this has the effect that you may need to do it twice, or force a build before the cloning of data
     if ($attr->{predicate}) {
       my $pred = $attr->{predicate};
       next if !$self->$pred();
     }
+
     if (!exists$arg_refs->{$init_arg} && defined $self->$reader()) {
+      my $value = $self->$reader();
       $arg_refs->{$init_arg} = $self->$reader();
     }
   }
