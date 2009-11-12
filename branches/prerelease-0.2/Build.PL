@@ -32,6 +32,7 @@ my $builder = Module::Build->new(
 							 'Test::More' => '0.8',
                'Test::Exception' => 0,
                'JSON' => 0,
+               'MooseX::InsideOut' => 0,
 							},
 				 build_recommends    => {
 							 'Test::Cmd' => '1.05',
