@@ -8,7 +8,7 @@ use MooseX::InsideOut;
 use Carp;
 use English qw{-no_match_vars};
 
-with qw{MooseX::AttributeCloner};
+with qw{MooseX::Getopt MooseX::AttributeCloner};
 
 has q{attr1} => (isa => q{Str}, is => q{ro}, predicate => q{has_attr1});
 has q{attr2} => (isa => q{Str}, is => q{ro}, required => 1);
