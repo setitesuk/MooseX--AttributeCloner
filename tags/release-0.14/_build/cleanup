@@ -1,0 +1,5 @@
+do{ my $x = {
+       'MooseX-AttributeCloner-0.14' => 1,
+       'blib' => 1
+     };
+$x; }
