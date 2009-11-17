@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.2;
+our $VERSION = 0.14;
 
 =head1 NAME
 
