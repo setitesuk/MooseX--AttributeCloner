@@ -1,7 +1,7 @@
 #############
 # Created By: setitesuk@gmail.com
 # Created On: 2009-11-03
-# Last Updated: 2009-11-09
+# Last Updated: 2009-11-23
 
 package MooseX::AttributeCloner;
 use Moose::Role;
@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-$LastChangedRevision$
+0.15
 
 =head1 SYNOPSIS
 
