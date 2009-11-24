@@ -21,7 +21,7 @@ has q{attr7} => (isa => q{Str}, is => q{ro});
 has q{object_attr} => (isa => q{Object}, is => q{ro});
 has q{hash_attr} => (isa => q{HashRef}, is => q{ro});
 has q{array_attr} => (isa => q{ArrayRef}, is => q{ro});
-
+has q{Boolean} => (isa => q{Bool}, is => q{rw});
 no Moose;
 __PACKAGE__->meta->make_immutable;
 1;

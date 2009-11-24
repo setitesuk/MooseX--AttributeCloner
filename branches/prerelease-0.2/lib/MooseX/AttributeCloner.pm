@@ -104,7 +104,7 @@ sub attributes_as_command_options {
   my ($self,$arg_refs) = @_;
   $arg_refs ||= {};
 
-  my $attributes = $self->_hash_of_attribute_values();
+  my $attributes = $self->_hash_of_attribute_values({command_options => 1});
   # remove any objects from the hash
   $self->_traverse_hash($attributes);
 
@@ -161,13 +161,13 @@ sub _create_string {
   my ($self, $attr, $value, $arg_refs, $hash) = @_;
   my $string = $attr;
 
-  if (!$hash && $arg_refs->{equal}) {
+  if ($value ne q{} && !$hash && $arg_refs->{equal}) {
     $string .= q{=};
   } else {
     $string .= q{ }; # default attr value separator
   }
 
-  if ($arg_refs->{quotes}) {
+  if ($value ne q{} && $arg_refs->{quotes}) {
     $string .= qq{"$value"};
   } else {
     $string .= qq{$value}; # default no quote of value
@@ -218,12 +218,18 @@ sub _hash_of_attribute_values {
   my ($self, $arg_refs) = @_;
   $arg_refs ||= {};
 
+  my $command_options = $arg_refs->{command_options};
+  delete$arg_refs->{command_options};
+
   my @attributes = $self->meta->get_all_attributes();
   foreach my $attr (@attributes) {
-    my $reader   = $attr->reader();
+    my $reader   = $attr->reader()   || $attr->accessor();
     my $init_arg = $attr->init_arg();
 
-    next if (!$reader); # if there is no reader method, then we can't read the attribute value, so skip
+    # if there is no reader/accessor method, then we can't read the attribute value, so skip
+    next if (!$reader);
+
+    # if the reader/accessor are private, then we don't want to pass it around
     next if ($reader =~ /\A_/xms);
 
     # if lazy_build, then will only propagate data if it is built, saving any expensive build routines.
@@ -234,8 +240,7 @@ sub _hash_of_attribute_values {
     }
 
     if (!exists$arg_refs->{$init_arg} && defined $self->$reader()) {
-      my $value = $self->$reader();
-      $arg_refs->{$init_arg} = $self->$reader();
+      $arg_refs->{$init_arg} = $attr->type_constraint() eq q{Bool} && $command_options ? q{} : $self->$reader();
     }
   }
 
