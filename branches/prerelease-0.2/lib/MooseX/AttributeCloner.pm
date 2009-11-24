@@ -94,9 +94,17 @@ By default, it returns the options with a double dash, space separated, and not 
 
 Although, if you are passing a hash_ref, this will always be space separated attr val.
 
+You may exclude some values if you wish. To do this, use the example below
+
+  my $command_line_string = $class->attributes_as_command_options({
+    excluded_attributes => [qw(init_arg1 init_arg2 init_arg3)],
+  });
+
+Note here you are using the init_arg, rather than any reader/accessor method names to exclude the option, as it is the init_arg which will be used in the command_line string generated
+
 No additional command_line params can be pushed into this, it only deals with the attributes already set in the current object
 
-Note, it is your responsibility to know where you may need any of these to be on or off, as it is an all or nothing approach
+Note, it is your responsibility to know where you may need any of these to be on or off, unless they have no init_arg (init_arg => undef)
 
 =cut
 
@@ -105,6 +113,10 @@ sub attributes_as_command_options {
   $arg_refs ||= {};
 
   my $attributes = $self->_hash_of_attribute_values({command_options => 1});
+
+  # exclude any specified init_args
+  $self->_exclude_args($attributes, $arg_refs);
+
   # remove any objects from the hash
   $self->_traverse_hash($attributes);
 
@@ -291,6 +303,27 @@ sub _traverse_array {
     push @wanted_items, undef;
   }
   return \@wanted_items;
+}
+
+############
+# remove any unwanted options by the init_arg they would have
+
+sub _exclude_args {
+  my ($self, $attributes, $arg_refs) = @_;
+  my $excluded_attributes = $arg_refs->{excluded_attributes};
+  delete $arg_refs->{excluded_attributes};
+  if (!$excluded_attributes) {
+    return 1;
+  }
+
+  if (ref$excluded_attributes ne q{ARRAY}) {
+    croak qq{Your excluded_attributes are not in an arrayref - $excluded_attributes};
+  }
+
+  foreach my $exclusion (@{$excluded_attributes}) {
+    delete $attributes->{$exclusion};
+  }
+  return 1;
 }
 
 1;

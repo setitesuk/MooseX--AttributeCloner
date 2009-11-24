@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Carp;
 use English qw{-no_match_vars};
-use Test::More tests => 24;
+use Test::More tests => 26;
 use Test::Exception;
 use lib qw{t/lib};
 use JSON;
@@ -78,5 +78,7 @@ BEGIN {
   $ref_test->Boolean(1); # also tests the usage of accessor rather than just reader
   is($ref_test->attributes_as_command_options(), q{--hash_attr key2=val2 --hash_attr key1=val1 --attr2 0 --attr1 test1 --Boolean  --array_attr 1 --array_attr 2 --array_attr 3}, q{attributes_as_command_options with a Boolean in it is correct});
   is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-hash_attr "key2=val2" -hash_attr "key1=val1" -attr2="0" -attr1="test1" -Boolean  -array_attr="1" -array_attr="2" -array_attr="3"}, q{attributes_as_command_options with options on and a Boolean is ok});
+  is($ref_test->attributes_as_command_options({excluded_attributes => [qw{hash_attr Boolean}]}), q{--attr2 0 --attr1 test1 --array_attr 1 --array_attr 2 --array_attr 3}, q{attributes excluded ok});
+  throws_ok { $ref_test->attributes_as_command_options({excluded_attributes => q{string}}); } qr{Your[ ]excluded_attributes[ ]are[ ]not[ ]in[ ]an[ ]arrayref[ ]-[ ]string}, q{thrown error as excluded_attributes is not an arrayref};
 }
 1;
