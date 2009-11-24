@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Carp;
 use English qw{-no_match_vars};
-use Test::More 'no_plan';#tests => ;
+use Test::More tests => 24;
 use Test::Exception;
 use lib qw{t/lib};
 use JSON;
@@ -75,5 +75,8 @@ BEGIN {
   is_deeply(from_json($escaped_json_string), $json_test_hash, q{escaped json string ok});
   is($ref_test->attributes_as_command_options(), q{--hash_attr key2=val2 --hash_attr key1=val1 --attr2 0 --attr1 test1 --array_attr 1 --array_attr 2 --array_attr 3}, q{default attributes_as_command_options ok});
   is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-hash_attr "key2=val2" -hash_attr "key1=val1" -attr2="0" -attr1="test1" -array_attr="1" -array_attr="2" -array_attr="3"}, q{attributes_as_command_options with options on ok});
+  $ref_test->Boolean(1); # also tests the usage of accessor rather than just reader
+  is($ref_test->attributes_as_command_options(), q{--hash_attr key2=val2 --hash_attr key1=val1 --attr2 0 --attr1 test1 --Boolean  --array_attr 1 --array_attr 2 --array_attr 3}, q{attributes_as_command_options with a Boolean in it is correct});
+  is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-hash_attr "key2=val2" -hash_attr "key1=val1" -attr2="0" -attr1="test1" -Boolean  -array_attr="1" -array_attr="2" -array_attr="3"}, q{attributes_as_command_options with options on and a Boolean is ok});
 }
 1;

@@ -1,6 +1,10 @@
 LIST OF CHANGES
 ---------------
 
+release 0.16
+ - bug when attributes are rw with no reader method specified - fixed
+ - booleans produced as normally expected with MooseX::Getopt/Getopt::Long in the command_line
+
 release 0.15
  - test correction - added skip to author tests if $ENV{TEST_AUTHOR} not true
 
