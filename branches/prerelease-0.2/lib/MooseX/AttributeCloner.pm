@@ -97,10 +97,16 @@ Although, if you are passing a hash_ref, this will always be space separated att
 You may exclude some values if you wish. To do this, use the example below
 
   my $command_line_string = $class->attributes_as_command_options({
-    excluded_attributes => [qw(init_arg1 init_arg2 init_arg3)],
+    excluded_attributes => [ qw( init_arg1 init_arg2 init_arg3 ) ],
   });
 
 Note here you are using the init_arg, rather than any reader/accessor method names to exclude the option, as it is the init_arg which will be used in the command_line string generated
+
+Sometimes you may have floating attributes for argv and ARGV (we have discovered this with MooseX::Getopt). As such, these are being treated as 'special', and these will be excluded by default. You can request them to be included as follows.
+
+  my $command_line_string = $class->attributes_as_command_options({
+    included_argv_attributes => [ qw( argv ARGV ) ],
+  });
 
 No additional command_line params can be pushed into this, it only deals with the attributes already set in the current object
 
@@ -310,9 +316,11 @@ sub _traverse_array {
 
 sub _exclude_args {
   my ($self, $attributes, $arg_refs) = @_;
-  my $excluded_attributes = $arg_refs->{excluded_attributes};
+  my $excluded_attributes = $arg_refs->{excluded_attributes} || [];
   delete $arg_refs->{excluded_attributes};
-  if (!$excluded_attributes) {
+  my $included_argv_attributes = $arg_refs->{included_argv_attributes} || [];
+  delete $arg_refs->{included_argv_attributes};
+  if (!$excluded_attributes && !$included_argv_attributes) {
     return 1;
   }
 
@@ -320,9 +328,25 @@ sub _exclude_args {
     croak qq{Your excluded_attributes are not in an arrayref - $excluded_attributes};
   }
 
+  if (ref$included_argv_attributes ne q{ARRAY}) {
+    croak qq{Your included_argv_attributes are not in an arrayref - $included_argv_attributes};
+  }
+
   foreach my $exclusion (@{$excluded_attributes}) {
     delete $attributes->{$exclusion};
   }
+
+  my $wanted_argv = {};
+  foreach my $inclusion (@{$included_argv_attributes}) {
+    $wanted_argv->{$inclusion}++;
+  }
+
+  foreach my $argv ( qw{ argv ARGV }) {
+    if (!$wanted_argv->{$argv}) {
+      delete $attributes->{$argv};
+    }
+  }
+
   return 1;
 }
 
