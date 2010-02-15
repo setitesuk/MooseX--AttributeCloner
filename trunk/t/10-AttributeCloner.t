@@ -2,15 +2,15 @@ use strict;
 use warnings;
 use Carp;
 use English qw{-no_match_vars};
-use Test::More tests => 28;
+use Test::More tests => 34;
 use Test::Exception;
 use lib qw{t/lib};
 use JSON;
 
 BEGIN {
   use_ok(q{TestAttributeCloner});
+  use_ok(q{TestExtraNewAttributeCloner});
 }
-
 {
   my $object_to_clone;
   lives_ok { $object_to_clone = TestAttributeCloner->new({
@@ -82,5 +82,19 @@ BEGIN {
   throws_ok { $ref_test->attributes_as_command_options({excluded_attributes => q{string}}); } qr{Your[ ]excluded_attributes[ ]are[ ]not[ ]in[ ]an[ ]arrayref[ ]-[ ]string}, q{thrown error as excluded_attributes is not an arrayref};
   throws_ok { $ref_test->attributes_as_command_options({included_argv_attributes => q{string}}); } qr{Your[ ]included_argv_attributes[ ]are[ ]not[ ]in[ ]an[ ]arrayref[ ]-[ ]string}, q{thrown error as included_argv_attributes is not an arrayref};
   lives_ok { $ref_test->attributes_as_command_options({included_argv_attributes => [qw{argv ARGV}]}); } q{run ok with an arrayref of included_argv_attributes};
+}
+{
+  my $test_object = TestExtraNewAttributeCloner->new({
+    attr1 => q{test1},
+    attr2 => q{0},
+    attr8 => q{test8},
+  });
+
+  my $tested_object;
+  lives_ok { $tested_object = $test_object->test_package(); } q{no croak on using <package name>->new_with_cloned_attributes($object)};
+  isa_ok($tested_object, q{TestNewAttributeCloner}, q{$tested_object});
+  is($tested_object->attr1(), q{test1}, q{attr1 cloned ok});
+  is($tested_object->attr2(), q{0}, q{attr2 cloned ok});
+  is($tested_object->attr8(), q{test8}, q{attr8 cloned ok});
 }
 1;

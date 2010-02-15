@@ -19,7 +19,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-$LastChangedRevision$
+0.2
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,12 @@ plus anything in the $arg_refs hash.
 sub new_with_cloned_attributes {
   my ($self, $package, $arg_refs) = @_;
   $arg_refs ||= {};
+
+  if (!ref$self && ref$package) {
+    my $temp = $self;
+    $self = $package;
+    $package = $temp;
+  }
 
   eval {
     my $package_file_name = $package;

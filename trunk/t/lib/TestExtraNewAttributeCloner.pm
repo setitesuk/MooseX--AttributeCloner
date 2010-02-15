@@ -1,12 +1,13 @@
 #############
 # Created By: setitesuk
-# Created On: 2009-11-06
+# Created On: 2010-02-15
 
-package TestNewAttributeCloner;
+package TestExtraNewAttributeCloner;
 use Moose;
 use MooseX::InsideOut;
 use Carp;
 use English qw{-no_match_vars};
+use TestNewAttributeCloner;
 
 extends qw{TestAttributeCloner};
 
@@ -14,6 +15,10 @@ has q{attr8} => (isa => q{Str}, is => q{ro});
 has q{attr9} => (isa => q{Str}, is => q{ro});
 has q{attr10} => (isa => q{Str}, is => q{ro});
 
+sub test_package {
+  my ($self) = @_;
+  return TestNewAttributeCloner->new_with_cloned_attributes($self);
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
@@ -22,7 +27,7 @@ __END__
 
 =head1 NAME
 
-TestNewAttributeCloner
+TestExtraNewAttributeCloner
 
 =head1 VERSION
 

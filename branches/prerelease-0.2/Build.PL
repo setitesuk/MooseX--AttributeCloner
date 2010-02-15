@@ -19,6 +19,7 @@ my $builder = Module::Build->new(
 				  'Moose' => 0,
 				  'Moose::Role' => 0,
 				  'MooseX::InsideOut' => 0,
+				  'MooseX::Getopt' => 0,
 				  'Carp' => 1.04,
 				  'English' => 1.02,
 				  'Readonly' => '1.03',

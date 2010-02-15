@@ -33,7 +33,7 @@ TestAttributeCloner
 
 =head1 VERSION
 
-0.1
+0.19
 
 =head1 SYNOPSIS
 
