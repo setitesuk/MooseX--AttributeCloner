@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.19.5;
+our $VERSION = 0.2;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-0.19.5
+0.2
 
 =head1 SYNOPSIS
 
@@ -398,6 +398,16 @@ __END__
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
+This could fail to install if you do not have Module::Build 0.3603 available, since the passthrough style of it's
+production of Makefile.PL has been deprecated, so it now uses small. This means that you either need to have it
+installed, or be able to utilise 'configure_requires' (available in modern installations of CPAN.pm/CPANPLUS and
+perl 5.10.1)
+
+see http://search.cpan.org/~dagolden/Module-Build-0.3603/lib/Module/Build/Compat.pm for further details about this
+
+As far as I can tell, as long as you have any version of Module::Build, you should be OK, but if it is not, and
+you cannot utilise 'configure_requires', then this is likely to fail.
+
 =head1 DEPENDENCIES
 
 =over
@@ -411,6 +421,8 @@ __END__
 =item Readonly
 
 =item JSON
+
+=item Module::Build 0.3603
 
 =back
 

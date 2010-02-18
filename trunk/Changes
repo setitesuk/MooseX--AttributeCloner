@@ -1,6 +1,10 @@
 LIST OF CHANGES
 ---------------
 
+release 0.2
+ - bug fix where failed test since t/lib/TestExtraNewAttributeCloner.pm no in distribution
+ - fix of deprecated passthrough version of Module::Build to small for Makefile.PL generation
+
 release 0.19
  - put MooseX::Getopt in dependencies within Build.PL
  - package name can be used (i.e. <package>->new_with_cloned_attributes($self, {}) ) but both classes need to utilise the role to do this
