@@ -7,7 +7,7 @@ use warnings;
 use Module::Build;
 use lib qw(. lib);
 
-our $VERSION = 0.19.5;
+our $VERSION = 0.19_5;
 
 my $builder = Module::Build->new(
 				 module_name         => 'MooseX::AttributeCloner',
@@ -45,7 +45,8 @@ my $builder = Module::Build->new(
 							 'Test::Pod::Coverage' => 1.00,
 							 
 							},
-				 create_makefile_pl  => 'passthrough',
+				 create_makefile_pl  => 'small',
+				 configure_requires  => { 'Module::Build' => 0.3603 }
 				);
 
 $builder->create_build_script();

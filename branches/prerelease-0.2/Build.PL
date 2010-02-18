@@ -45,7 +45,8 @@ my $builder = Module::Build->new(
 							 'Test::Pod::Coverage' => 1.00,
 							 
 							},
-				 create_makefile_pl  => 'passthrough',
+				 create_makefile_pl  => 'small',
+				 configure_requires  => { 'Module::Build' => 0.3603 }
 				);
 
 $builder->create_build_script();
