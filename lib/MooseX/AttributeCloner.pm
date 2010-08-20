@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-0.18
+0.19
 
 =head1 SYNOPSIS
 
@@ -29,6 +29,15 @@ MooseX::AttributeCloner
 
   my $NewClassObject = $self->new_with_cloned_attributes(q{New::Class}, {});
   1;
+
+  package My::Class;
+  use Moose;
+
+  use Some::Other::Package; # which has also 'with'ed MooseX:AttributeCloner
+ 
+  with qw{MooseX::AttributeCloner};
+
+  my $NewClassObject = Some::Other::Package->new_with_cloned_attributes($self, {});
 
 =head1 DESCRIPTION
 
@@ -54,11 +63,41 @@ This takes a package name as the first argument, plus an optional additional $ar
 return a class object of the package populated with any matching attribute data from the current object,
 plus anything in the $arg_refs hash.
 
+  package My::Class;
+  use Moose;
+  with qw{MooseX::AttributeCloner};
+
+  my $NewClassObject = $self->new_with_cloned_attributes(q{New::Class}, {});
+  1;
+
+As of 0.19, you can use a package, and then call as follows:
+
+  package My::Class;
+  use Moose;
+
+  use Some::Other::Package; # which has also 'with'ed MooseX:AttributeCloner
+ 
+  with qw{MooseX::AttributeCloner};
+
+  my $NewClassObject = Some::Other::Package->new_with_cloned_attributes($self, {});
+
+This works just by switching around the package and $self internally, so both will need to utilise this role.
+(This is a low priority TODO - remove the need to have the this role on the calling class if the package has it)
+
 =cut
 
 sub new_with_cloned_attributes {
   my ($self, $package, $arg_refs) = @_;
   $arg_refs ||= {};
+
+  my $package_called; # prep for potentially being able to eliminate the calling class needing this role
+
+  if (!ref$self && ref$package) {
+    my $temp = $self;
+    $self = $package;
+    $package = $temp;
+    $package_called++;
+  }
 
   eval {
     my $package_file_name = $package;
@@ -70,7 +109,9 @@ sub new_with_cloned_attributes {
   } or do {
     confess $EVAL_ERROR;
   };
+
   $self->_hash_of_attribute_values($arg_refs);
+
   return $package->new($arg_refs);
 }
 
