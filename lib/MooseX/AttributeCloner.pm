@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-0.13
+$LastChangedRevision$
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,107 @@ sub new_with_cloned_attributes {
   };
   $self->_hash_of_attribute_values($arg_refs);
   return $package->new($arg_refs);
+}
+
+=head2 attributes_as_command_options
+
+returns all the built attributes that are not objects as a string of command_line options
+only the first level of references will be passed through, multi-dimensional data structures
+should use the json serialisation option and deserialise it on object construction or script
+running
+
+  my $command_line_string = $class->attributes_as_command_options();
+  --attr1 val1 --attr2 val2
+
+By default, it returns the options with a double dash, space separated, and not quoted (as above). These can be switched by submitting a hash_ref as follows
+
+  my $command_line_string = $class->attributes_as_command_options({
+    equal => 1,
+    quotes => 1,
+    single_dash => 1,
+  });
+
+Although, if you are passing a hash_ref, this will always be space separated attr val.
+
+No additional command_line params can be pushed into this, it only deals with the attributes already set in the current object
+
+Note, it is your responsibility to know where you may need any of these to be on or off, as it is an all or nothing approach
+
+=cut
+
+sub attributes_as_command_options {
+  my ($self,$arg_refs) = @_;
+  $arg_refs ||= {};
+
+  my $attributes = $self->_hash_of_attribute_values();
+  # remove any objects from the hash
+  $self->_traverse_hash($attributes);
+
+  my @command_line_options;
+
+  foreach my $key (keys %{$attributes}) {
+
+    if (! ref $attributes->{$key}) {
+      my $string = $self->_create_string($key, $attributes->{$key}, $arg_refs);
+      push @command_line_options, $string;
+      next;
+    }
+
+    if (ref $attributes->{$key} eq q{HASH}) {
+
+      foreach my $h_key (keys %{$attributes->{$key}}) {
+
+        if (defined $attributes->{$key}->{$h_key} && ! ref $attributes->{$key}->{$h_key}) { # don't pass through empty strings or references
+          my $string = $self->_create_string($key, qq{$h_key=$attributes->{$key}->{$h_key}}, $arg_refs, 1);
+          push @command_line_options, $string;
+        }
+
+      }
+
+    }
+
+    if (ref $attributes->{$key} eq q{ARRAY}) {
+
+      foreach my $value (@{$attributes->{$key}}) {
+
+        if (defined $value && ! ref $value) { # don't pass through empty strings or references
+          my $string = $self->_create_string($key, $value, $arg_refs);
+          push @command_line_options, $string;
+        }
+
+      }
+
+    }
+
+  }
+
+  my $clo_string;
+  if ($arg_refs->{single_dash}) {
+    $clo_string = join q{ -}, @command_line_options;
+    $clo_string = q{-} . $clo_string;
+  } else {
+    $clo_string = join q{ --}, @command_line_options;
+    $clo_string = q{--} . $clo_string;
+  }
+  return $clo_string;
+}
+
+sub _create_string {
+  my ($self, $attr, $value, $arg_refs, $hash) = @_;
+  my $string = $attr;
+
+  if (!$hash && $arg_refs->{equal}) {
+    $string .= q{=};
+  } else {
+    $string .= q{ }; # default attr value separator
+  }
+
+  if ($arg_refs->{quotes}) {
+    $string .= qq{"$value"};
+  } else {
+    $string .= qq{$value}; # default no quote of value
+  }
+  return $string;
 }
 
 =head2 attributes_as_json

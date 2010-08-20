@@ -69,7 +69,11 @@ BEGIN {
 
   is_deeply(from_json($ref_test->attributes_as_json()), $json_test_hash, q{json string is ok});
 
-  my $escaped_json_string = q(\{\"hash_attr\"\:\{\"key2\"\:\"val2\"\,\"key1\"\:\"val1\"\}\,\"attr2\"\:\"0\"\,\"attr1\"\:\"test1\"\,\"array_attr\"\:\[1\,2\,3\,\{\"key2\"\:\"val2\"\,\"key1\"\:\"val1\"\}\,null\]\});
-  is($ref_test->attributes_as_escaped_json(), $escaped_json_string, q{escaped json string ok});
+  my $escaped_json_string = $ref_test->attributes_as_escaped_json();
+  $escaped_json_string =~ s{\\}{}gxms; # remove escape characters
+  
+  is_deeply(from_json($escaped_json_string), $json_test_hash, q{escaped json string ok});
+  is($ref_test->attributes_as_command_options(), q{--hash_attr key2=val2 --hash_attr key1=val1 --attr2 0 --attr1 test1 --array_attr 1 --array_attr 2 --array_attr 3}, q{default attributes_as_command_options ok});
+  is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-hash_attr "key2=val2" -hash_attr "key1=val1" -attr2="0" -attr1="test1" -array_attr="1" -array_attr="2" -array_attr="3"}, q{attributes_as_command_options with options on ok});
 }
 1;
