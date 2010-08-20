@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Carp;
 use English qw{-no_match_vars};
-use Test::More tests => 26;
+use Test::More tests => 28;
 use Test::Exception;
 use lib qw{t/lib};
 use JSON;
@@ -80,5 +80,7 @@ BEGIN {
   is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-hash_attr "key2=val2" -hash_attr "key1=val1" -attr2="0" -attr1="test1" -Boolean  -array_attr="1" -array_attr="2" -array_attr="3"}, q{attributes_as_command_options with options on and a Boolean is ok});
   is($ref_test->attributes_as_command_options({excluded_attributes => [qw{hash_attr Boolean}]}), q{--attr2 0 --attr1 test1 --array_attr 1 --array_attr 2 --array_attr 3}, q{attributes excluded ok});
   throws_ok { $ref_test->attributes_as_command_options({excluded_attributes => q{string}}); } qr{Your[ ]excluded_attributes[ ]are[ ]not[ ]in[ ]an[ ]arrayref[ ]-[ ]string}, q{thrown error as excluded_attributes is not an arrayref};
+  throws_ok { $ref_test->attributes_as_command_options({included_argv_attributes => q{string}}); } qr{Your[ ]included_argv_attributes[ ]are[ ]not[ ]in[ ]an[ ]arrayref[ ]-[ ]string}, q{thrown error as included_argv_attributes is not an arrayref};
+  lives_ok { $ref_test->attributes_as_command_options({included_argv_attributes => [qw{argv ARGV}]}); } q{run ok with an arrayref of included_argv_attributes};
 }
 1;
