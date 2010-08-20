@@ -12,5 +12,5 @@ my $oNewClass = New::Class->new({
 ...
 });
 
-Which is going to get, quite frankly, tedious in the extreme. Particularly when you have more than
-2 class objects in your chain.
+Which is going to get, quite frankly, tedious in the extreme. Particularly when you have more 2 class
+objects in your chain.
