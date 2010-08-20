@@ -10,7 +10,7 @@ use Readonly;
 
 use JSON;
 
-Readonly::Scalar our $VERSION => do { my ($r) = q$LastChangedRevision: 5210 $ =~ /(\d+)/mxs; $r; };
+our $VERSION = 0.11;
 
 =head1 NAME
 
