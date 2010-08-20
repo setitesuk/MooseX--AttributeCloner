@@ -1,6 +1,7 @@
 #############
 # Created By: setitesuk@gmail.com
 # Created On: 2009-11-03
+# Last Updated: 2009-11-09
 
 package MooseX::AttributeCloner;
 use Moose::Role;
@@ -10,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 =head1 NAME
 
@@ -18,7 +19,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-$LastChangedRevision$
+0.13
 
 =head1 SYNOPSIS
 
@@ -73,12 +74,15 @@ sub new_with_cloned_attributes {
   return $package->new($arg_refs);
 }
 
-=head2 attributes_as_json - returns all the built attributes that are not objects as a JSON string
+=head2 attributes_as_json
+
+returns all the built attributes that are not objects as a JSON string
 
   my $sAttributesAsJSON = $class->attributes_as_json();
 
-=head2 attributes_as_escaped_json - as attributes_as_json, except it is an escaped JSON string, so that this could be used
-on a command line
+=head2 attributes_as_escaped_json
+
+as attributes_as_json, except it is an escaped JSON string, so that this could be used on a command line
 
   my $sAttributesAsEscapedJSON = $class->attributes_as_escaped_json();
 
@@ -115,10 +119,13 @@ sub _hash_of_attribute_values {
 
   my @attributes = $self->meta->get_all_attributes();
   foreach my $attr (@attributes) {
-    my $reader   = $attr->{reader};
-    my $init_arg = $attr->{init_arg};
+    my $reader   = $attr->reader();
+    my $init_arg = $attr->init_arg();
 
-    # if lazy_build, then will only propagate data if it is built, saving any expensive build routines
+    next if (!$reader); # if there is no reader method, then we can't read the attribute value, so skip
+    next if ($reader =~ /\A_/xms);
+
+    # if lazy_build, then will only propagate data if it is built, saving any expensive build routines.
     # obviously, this has the effect that you may need to do it twice, or force a build before the cloning of data
     if ($attr->{predicate}) {
       my $pred = $attr->{predicate};
@@ -126,6 +133,7 @@ sub _hash_of_attribute_values {
     }
 
     if (!exists$arg_refs->{$init_arg} && defined $self->$reader()) {
+      my $value = $self->$reader();
       $arg_refs->{$init_arg} = $self->$reader();
     }
   }
@@ -198,7 +206,7 @@ __END__
 
 =item Readonly
 
-=item MooseX::Storage
+=item JSON
 
 =back
 
