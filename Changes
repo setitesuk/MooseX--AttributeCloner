@@ -1,6 +1,10 @@
 LIST OF CHANGES
 ---------------
 
+release 0.21
+ - sort order to return for command line options, as some operating systems can return keys from a HASH in a different order
+ - test for ARRAYref for included and excluded args more complete
+
 release 0.2
  - bug fix where failed test since t/lib/TestExtraNewAttributeCloner.pm no in distribution
  - fix of deprecated passthrough version of Module::Build to small for Makefile.PL generation

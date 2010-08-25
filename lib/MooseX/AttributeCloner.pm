@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.2;
+our $VERSION = 0.21;
 
 =head1 NAME
 
@@ -134,7 +134,8 @@ sub attributes_as_command_options {
 
   my @command_line_options;
 
-  foreach my $key (keys %{$attributes}) {
+  # version 0.21 - force this to be in a sorted order, so that results can be consistent should operating systems return keys in a different order
+  foreach my $key (sort keys %{$attributes}) {
 
     if (! ref $attributes->{$key}) {
       my $string = $self->_create_string($key, $attributes->{$key}, $arg_refs);
@@ -330,11 +331,11 @@ sub _exclude_args {
     return 1;
   }
 
-  if (ref$excluded_attributes ne q{ARRAY}) {
+  if ( ! ref$excluded_attributes || ref$excluded_attributes ne q{ARRAY} ) {
     croak qq{Your excluded_attributes are not in an arrayref - $excluded_attributes};
   }
 
-  if (ref$included_argv_attributes ne q{ARRAY}) {
+  if ( ! ref$included_argv_attributes || ref$included_argv_attributes ne q{ARRAY} ) {
     croak qq{Your included_argv_attributes are not in an arrayref - $included_argv_attributes};
   }
 
