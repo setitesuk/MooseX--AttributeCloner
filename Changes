@@ -1,6 +1,9 @@
 LIST OF CHANGES
 ---------------
 
+release 0.22
+ - patch in to ensure that command line booleans are only there if the boolean is true
+
 release 0.21
  - sort order to return for command line options, as some operating systems can return keys from a HASH in a different order
  - test for ARRAYref for included and excluded args more complete
