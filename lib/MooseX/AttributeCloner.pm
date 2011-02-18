@@ -265,6 +265,7 @@ sub _hash_of_attribute_values {
     }
 
     if ($init_arg && !exists$arg_refs->{$init_arg} && defined $self->$reader()) {
+      next if ( $attr->type_constraint() eq q{Bool} && $command_options && ! $self->$reader );
       $arg_refs->{$init_arg} = $attr->type_constraint() eq q{Bool} && $command_options ? q{} : $self->$reader();
     }
   }

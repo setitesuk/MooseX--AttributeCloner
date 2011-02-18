@@ -20,7 +20,25 @@ has q{attr7} => (isa => q{Str}, is => q{ro});
 
 has q{object_attr} => (isa => q{Object}, is => q{ro});
 has q{hash_attr} => (isa => q{HashRef}, is => q{ro});
-has q{array_attr} => (isa => q{ArrayRef}, is => q{ro});
+has q{array_attr} => (
+        traits  => ['Array'],
+        is      => 'ro',
+        isa     => 'ArrayRef',
+        default => sub { [] },
+        handles => {
+            all_attrs    => 'elements',
+            add_attr     => 'push',
+            map_attrs    => 'map',
+            filter_attrs => 'grep',
+            find_attr    => 'first',
+            get_attr     => 'get',
+            join_attrs   => 'join',
+            count_attrs  => 'count',
+            has_attrs    => 'count',
+            has_no_attrs => 'is_empty',
+            sorted_attrs => 'sort',
+        },
+);
 has q{Boolean} => (isa => q{Bool}, is => q{rw});
 no Moose;
 __PACKAGE__->meta->make_immutable;
