@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.21;
+our $VERSION = 0.23;
 
 =head1 NAME
 
@@ -394,7 +394,7 @@ setitesuk
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009 Andy Brown (setitesuk@gmail.com)
+Copyright (C) 2011 Andy Brown (setitesuk@gmail.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

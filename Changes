@@ -1,6 +1,9 @@
 LIST OF CHANGES
 ---------------
 
+release 0.23
+ - MooseX::InsideOut 0.106 doesn't work with Moose 2.0, so removing dependency
+
 release 0.22
  - patch in to ensure that command line booleans are only there if the boolean is true
 
