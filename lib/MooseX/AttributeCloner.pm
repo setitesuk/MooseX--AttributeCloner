@@ -182,24 +182,6 @@ sub attributes_as_command_options {
   return $clo_string;
 }
 
-sub _create_string {
-  my ($self, $attr, $value, $arg_refs, $hash) = @_;
-  my $string = $attr;
-
-  if ($value ne q{} && !$hash && $arg_refs->{equal}) {
-    $string .= q{=};
-  } else {
-    $string .= q{ }; # default attr value separator
-  }
-
-  if ($value ne q{} && $arg_refs->{quotes}) {
-    $string .= qq{"$value"};
-  } else {
-    $string .= qq{$value}; # default no quote of value
-  }
-  return $string;
-}
-
 =head2 attributes_as_json
 
 returns all the built attributes that are not objects as a JSON string
@@ -231,6 +213,30 @@ sub attributes_as_json {
   $self->_traverse_hash($attributes);
   my $json = to_json($attributes);
   return $json;
+}
+
+=head2 attributes_as_hashref
+
+Returns a hashref of the attributes this object has built,
+optionally excluding any specified attributes.
+Includes objects which may have been built.
+
+  my $hAttributesAsHashref = $class->attributes_as_hashref({
+    excluded_attributes => [ qw( init_arg1 init_arg2 init_arg3 ) ],
+  });
+
+Note here you are using the init_arg, rather than any reader/accessor method names to exclude the option
+
+=cut
+
+sub attributes_as_hashref {
+  my ( $self, $arg_refs ) = @_;
+  $arg_refs ||= {};
+  my $attributes = $self->_hash_of_attribute_values();
+
+  # exclude any specified init_args
+  $self->_exclude_args($attributes, $arg_refs);
+  return $attributes;
 }
 
 ###############
@@ -356,6 +362,26 @@ sub _exclude_args {
   }
 
   return 1;
+}
+
+# create a command line string
+
+sub _create_string {
+  my ($self, $attr, $value, $arg_refs, $hash) = @_;
+  my $string = $attr;
+
+  if ($value ne q{} && !$hash && $arg_refs->{equal}) {
+    $string .= q{=};
+  } else {
+    $string .= q{ }; # default attr value separator
+  }
+
+  if ($value ne q{} && $arg_refs->{quotes}) {
+    $string .= qq{"$value"};
+  } else {
+    $string .= qq{$value}; # default no quote of value
+  }
+  return $string;
 }
 
 1;
