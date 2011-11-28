@@ -201,7 +201,7 @@ Note, because objects are removed, arrays will remain the correct length, but ha
 sub attributes_as_escaped_json {
   my ($self) = @_;
   my $json = $self->attributes_as_json();
-  $json =~ s{([^A-Za-z0-9_-])}{\\$1}gmxs;
+  $json =~ s{([^\w\d-])}{\\$1}gmxs;
   return $json;
 }
 
