@@ -1,6 +1,9 @@
 LIST OF CHANGES
 ---------------
 
+release 0.25
+ - updated to work pass perl::critic tests with Perl::Critic v1.116
+
 release 0.24
  - addition of attributes_as_hashref method, returning built attributes as a hashref
 
