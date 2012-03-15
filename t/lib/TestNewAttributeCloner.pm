@@ -9,10 +9,10 @@ use English qw{-no_match_vars};
 
 extends qw{TestAttributeCloner};
 
-has q{attr8} => (isa => q{Str}, is => q{ro});
-has q{attr9} => (isa => q{Str}, is => q{ro});
+has q{attr8}  => (isa => q{Str}, is => q{ro});
+has q{attr9}  => (isa => q{Str}, is => q{ro});
 has q{attr10} => (isa => q{Str}, is => q{ro});
-
+has q{attr7}  => (isa => q{Str}, is => q{ro}, metaclass => q{NoGetopt});
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

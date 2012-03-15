@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Carp;
 use English qw{-no_match_vars};
-use Test::More tests => 39;
+use Test::More tests => 42;
 use Test::Exception;
 use lib qw{t/lib};
 use JSON;
@@ -40,7 +40,9 @@ BEGIN {
   lives_ok { $cloned_object = $object_to_clone->new_with_cloned_attributes(q{TestNewAttributeCloner},$arg_refs); } q{new_with_cloned_attributes ran ok};
   ok(!$cloned_object->has_attr1(), q{no attr1 value, so nothing passed through and not set});
   is($cloned_object->attr8(), q{test8}, q{attr8 value passed through ok from the arg_refs provided});
-
+  is($cloned_object->attr7(), q{test7}, q{attribute with MooseX::Getopt::Meta::Attribute::NoGetopt metaclass gets cloned to another object});
+  is(ref $cloned_object->meta()->get_attribute(q[attr7]), q[MooseX::Getopt::Meta::Attribute::NoGetopt], 'its metaclass is MooseX::Getopt::Meta::Attribute::NoGetopt');
+  is($cloned_object->attributes_as_command_options, q[--attr2 test2 --attr6 test6 --attr8 test8], 'but it is not cloned to the command line');
 
   my $hash_ref = { key1 => q{val1}, key2 => q{val2}, key_obj => $cloned_object};
   my $array_ref = [1,2,3,$hash_ref,$object_to_clone];
@@ -61,8 +63,6 @@ BEGIN {
   isa_ok($hash_key_object, q{TestNewAttributeCloner}, q{$cloned_ref_test->hash_attr()->{key_obj}});
   ok(ref$hash_key_object, q{$cloned_ref_test->hash_attr() is a ref});
   is($cloned_ref_test->array_attr()->[3],$hash_ref, q{array maintained});
-
-  
 
   my $json_string = q[{"hash_attr":{"key2":"val2","key1":"val1"},"attr2":"0","attr1":"test1","array_attr":[1,2,3,{"key2":"val2","key1":"val1"},null]}];
   my $json_test_hash = from_json($json_string);

@@ -13,13 +13,15 @@ use JSON;
 
 our $VERSION = 0.25;
 
+Readonly::Scalar our $ATTRIBUTE_METACLASS_TO_SKIP => q[MooseX::Getopt::Meta::Attribute::NoGetopt];
+
 =head1 NAME
 
 MooseX::AttributeCloner
 
 =head1 VERSION
 
-0.2
+0.25
 
 =head1 SYNOPSIS
 
@@ -118,6 +120,13 @@ No additional command_line params can be pushed into this, it only deals with th
 
 Note, it is your responsibility to know where you may need any of these to be on or off, unless they have no init_arg (init_arg => undef)
 
+From v0.25, any attributes with a metaclass of NoGetopt will not be translated to a command line as they would cause a failure to any new_with_options with MooseX::Getopt. You can override this by passing an additional argument 'include_no_getopt'
+
+  my $command_line_string = $class->attributes_as_command_options({
+    included_argv_attributes => [ qw( argv ARGV ) ],
+    include_no_getopt => 1,
+  });
+
 =cut
 
 sub attributes_as_command_options {
@@ -137,7 +146,9 @@ sub attributes_as_command_options {
   # version 0.21 - force this to be in a sorted order, so that results can be consistent should operating systems return keys in a different order
   foreach my $key (sort keys %{$attributes}) {
 
-    if (! ref $attributes->{$key}) {
+    if (! ref $attributes->{$key}
+          &&
+        ( (ref( $self->meta()->get_attribute($key) ) ne $ATTRIBUTE_METACLASS_TO_SKIP ) || $arg_refs->{include_no_getopt} ) ) {
       my $string = $self->_create_string($key, $attributes->{$key}, $arg_refs);
       push @command_line_options, $string;
       next;
