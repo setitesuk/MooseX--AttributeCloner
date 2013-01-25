@@ -73,11 +73,11 @@ BEGIN {
   $escaped_json_string =~ s{\\}{}gxms; # remove escape characters
   
   is_deeply(from_json($escaped_json_string), $json_test_hash, q{escaped json string ok});
-  is($ref_test->attributes_as_command_options(), q{--array_attr 1 --array_attr 2 --array_attr 3 --attr1 test1 --attr2 0 --hash_attr key2=val2 --hash_attr key1=val1}, q{default attributes_as_command_options ok});
-  is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-array_attr="1" -array_attr="2" -array_attr="3" -attr1="test1" -attr2="0" -hash_attr "key2=val2" -hash_attr "key1=val1"}, q{attributes_as_command_options with options on ok});
+  is($ref_test->attributes_as_command_options(), q{--array_attr 1 --array_attr 2 --array_attr 3 --attr1 test1 --attr2 0 --hash_attr key1=val1 --hash_attr key2=val2}, q{default attributes_as_command_options ok});
+  is($ref_test->attributes_as_command_options({equal => 1, quotes => 1, single_dash => 1}), q{-array_attr="1" -array_attr="2" -array_attr="3" -attr1="test1" -attr2="0" -hash_attr "key1=val1" -hash_attr "key2=val2"}, q{attributes_as_command_options with options on ok});
   $ref_test->Boolean(1); # also tests the usage of accessor rather than just reader
-  is($ref_test->attributes_as_command_options(), q{--Boolean  --array_attr 1 --array_attr 2 --array_attr 3 --attr1 test1 --attr2 0 --hash_attr key2=val2 --hash_attr key1=val1}, q{attributes_as_command_options with a Boolean in it is correct});
-  is($ref_test->attributes_as_command_options( { equal => 1, quotes => 1, single_dash => 1 } ), q{-Boolean  -array_attr="1" -array_attr="2" -array_attr="3" -attr1="test1" -attr2="0" -hash_attr "key2=val2" -hash_attr "key1=val1"}, q{attributes_as_command_options with options on and a Boolean is ok});
+  is($ref_test->attributes_as_command_options(), q{--Boolean  --array_attr 1 --array_attr 2 --array_attr 3 --attr1 test1 --attr2 0 --hash_attr key1=val1 --hash_attr key2=val2}, q{attributes_as_command_options with a Boolean in it is correct});
+  is($ref_test->attributes_as_command_options( { equal => 1, quotes => 1, single_dash => 1 } ), q{-Boolean  -array_attr="1" -array_attr="2" -array_attr="3" -attr1="test1" -attr2="0" -hash_attr "key1=val1" -hash_attr "key2=val2"}, q{attributes_as_command_options with options on and a Boolean is ok});
   is($ref_test->attributes_as_command_options( { excluded_attributes => [ qw{ hash_attr Boolean } ] }), q{--array_attr 1 --array_attr 2 --array_attr 3 --attr1 test1 --attr2 0}, q{attributes excluded ok});
   my $hashref = $ref_test->attributes_as_hashref( { excluded_attributes => [ qw{ hash_attr } ] });
   isa_ok( $hashref, q{HASH}, q{$ref_test->attributes_as_hashref} );
