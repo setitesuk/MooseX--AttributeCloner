@@ -11,7 +11,7 @@ use Readonly;
 
 use JSON;
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 Readonly::Scalar our $ATTRIBUTE_METACLASS_TO_SKIP => q[MooseX::Getopt::Meta::Attribute::NoGetopt];
 
@@ -21,7 +21,7 @@ MooseX::AttributeCloner
 
 =head1 VERSION
 
-0.25
+0.27
 
 =head1 SYNOPSIS
 

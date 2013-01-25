@@ -1,6 +1,9 @@
 LIST OF CHANGES
 ---------------
 
+release 0.27
+ - needed to update all version numbers, including POD
+
 release 0.26
  - sort '{$a cmp $b}' the order of hash attributes for command line string, to ensure the result is the same across different systems
 
