@@ -1,6 +1,9 @@
 LIST OF CHANGES
 ---------------
 
+release 0.26
+ - sort '{$a cmp $b}' the order of hash attributes for command line string, to ensure the result is the same across different systems
+
 release 0.25
  - patch provided by Marina Gourtovaia - if the metaclass of the attribute is MooseX::Getopt::Meta::Attribute::NoGetopt, do not copy it to the command line since it will not be accepted
  - updated to work pass perl::critic tests with Perl::Critic v1.116

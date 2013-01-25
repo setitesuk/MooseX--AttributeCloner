@@ -7,7 +7,7 @@ use warnings;
 use Module::Build;
 use lib qw(. lib);
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 my $builder = Module::Build->new(
 				 module_name         => 'MooseX::AttributeCloner',
